@@ -524,6 +524,22 @@ function renderNotesList() {
     card.querySelector('.note-edit-btn').addEventListener('click', () => editNote(note));
     card.querySelector('.note-delete-btn').addEventListener('click', () => deleteNote(note));
     notesListEl.appendChild(card);
+
+    const contentEl = card.querySelector('.note-content');
+    contentEl.classList.add('collapsed');
+    if (contentEl.scrollHeight > contentEl.clientHeight) {
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'note-toggle';
+      toggleBtn.textContent = 'Expandir';
+      toggleBtn.addEventListener('click', () => {
+        const collapsed = contentEl.classList.toggle('collapsed');
+        toggleBtn.textContent = collapsed ? 'Expandir' : 'Recolher';
+      });
+      contentEl.after(toggleBtn);
+    } else {
+      contentEl.classList.remove('collapsed');
+    }
   });
 }
 
