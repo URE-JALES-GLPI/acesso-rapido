@@ -1,0 +1,86 @@
+[
+  {
+    "id": "58b25f45-237f-427f-b613-d12a013e0de3",
+    "tileId": "9419192a-186c-430a-83e0-8099bcce887a",
+    "tileTitle": "Anydesk",
+    "timestamp": "2026-07-30T11:46:37.074Z"
+  },
+  {
+    "id": "784079d8-3c38-4ae1-99b1-92205d23d989",
+    "tileId": "439e636b-7666-41e7-89f1-8ba33f803fcb",
+    "tileTitle": "Sala do Futuro",
+    "timestamp": "2026-07-30T11:46:39.041Z"
+  },
+  {
+    "id": "68230482-4d4b-4c49-b585-3a4c5fd2ec1e",
+    "tileId": "9419192a-186c-430a-83e0-8099bcce887a",
+    "tileTitle": "Anydesk",
+    "timestamp": "2026-07-30T11:47:45.923Z"
+  },
+  {
+    "id": "7797db8b-6179-467e-ba74-e49df432d887",
+    "tileId": "439e636b-7666-41e7-89f1-8ba33f803fcb",
+    "tileTitle": "Sala do Futuro",
+    "timestamp": "2026-07-30T11:47:51.259Z"
+  },
+  {
+    "id": "022bbc90-a590-4384-92f4-e36472c96b5e",
+    "tileId": "439e636b-7666-41e7-89f1-8ba33f803fcb",
+    "tileTitle": "Sala do Futuro",
+    "timestamp": "2026-07-31T15:18:29.271Z"
+  },
+  {
+    "id": "8ea71afe-22f8-4d4a-87bb-324d1dfeae1d",
+    "tileId": "104f2e9c-2a77-47b3-8331-3f0e14af886b",
+    "tileTitle": "Chamados",
+    "timestamp": "2026-07-31T18:47:10.393Z"
+  },
+  {
+    "id": "f16881de-38fd-4e3a-9e0e-aefdbc272447",
+    "tileId": "92e6cdc4-277e-4d19-9a5f-4855e010678b",
+    "tileTitle": "SEI",
+    "timestamp": "2026-07-31T18:52:45.359Z"
+  },
+  {
+    "id": "dac55254-77c2-4659-8855-f33209725ba5",
+    "tileId": "104f2e9c-2a77-47b3-8331-3f0e14af886b",
+    "tileTitle": "Chamados",
+    "timestamp": "2026-07-31T18:52:51.826Z"
+  },
+  {
+    "id": "14be4698-6209-4d11-ac82-81eb52be2466",
+    "tileId": "9419192a-186c-430a-83e0-8099bcce887a",
+    "tileTitle": "Anydesk",
+    "timestamp": "2026-07-31T18:53:13.680Z"
+  },
+  {
+    "id": "b2ec707e-69cb-4882-9747-120b5a188c5b",
+    "tileId": "104f2e9c-2a77-47b3-8331-3f0e14af886b",
+    "tileTitle": "Chamados",
+    "timestamp": "2026-08-03T19:41:45.972Z"
+  },
+  {
+    "id": "04f709da-3cbd-4b0c-beb9-0c1fd6947be6",
+    "tileId": "92e6cdc4-277e-4d19-9a5f-4855e010678b",
+    "tileTitle": "SEI",
+    "timestamp": "2026-08-03T19:41:48.274Z"
+  },
+  {
+    "id": "4608dfa4-b2f5-4053-af0d-eaf4166bdaf7",
+    "tileId": "439e636b-7666-41e7-89f1-8ba33f803fcb",
+    "tileTitle": "Sala do Futuro",
+    "timestamp": "2026-08-03T19:41:50.571Z"
+  },
+  {
+    "id": "9f906353-c151-4519-a3d6-d034fa62dfc1",
+    "tileId": "cdd99438-db82-4c54-854f-e84a83e03410",
+    "tileTitle": "SED",
+    "timestamp": "2026-08-03T19:41:52.721Z"
+  },
+  {
+    "id": "9d0199b7-5d60-4e1f-9a5c-c8c692af0be5",
+    "tileId": "104f2e9c-2a77-47b3-8331-3f0e14af886b",
+    "tileTitle": "Chamados",
+    "timestamp": "2026-08-05T11:22:59.621Z"
+  }
+]

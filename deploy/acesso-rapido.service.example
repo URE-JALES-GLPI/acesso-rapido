@@ -1,0 +1,16 @@
+[Unit]
+Description=Acesso Rapido (hub de links)
+After=network.target
+
+[Service]
+Type=simple
+# Ajuste o usuario e o caminho abaixo para o seu servidor
+User=www-data
+WorkingDirectory=/var/www/acesso-rapido
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

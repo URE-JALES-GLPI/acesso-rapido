@@ -1,0 +1,20 @@
+[
+  {
+    "id": "9613853c-8834-4c43-884f-2e3cdde556ff",
+    "name": "Administradores",
+    "permissions": {
+      "admin": true,
+      "ti": true
+    },
+    "createdAt": "2026-08-06T11:06:56.542Z"
+  },
+  {
+    "id": "3893da30-f83d-4b41-a0e2-369b228bc3b8",
+    "name": "Equipe de TI",
+    "permissions": {
+      "admin": false,
+      "ti": true
+    },
+    "createdAt": "2026-08-06T11:06:56.542Z"
+  }
+]

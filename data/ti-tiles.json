@@ -1,0 +1,47 @@
+[
+  {
+    "id": "8d18859e-900b-4f6d-a76b-ce47ee4c5a60",
+    "title": "GLPI",
+    "url": "http://10.180.152.27/",
+    "image": "/uploads/9a18934a1fdd3de8e91d5fcc.png",
+    "color": null,
+    "tags": [],
+    "order": 0
+  },
+  {
+    "id": "e2a20c07-e50b-41b5-826d-30e3b6658438",
+    "title": "Zap",
+    "url": "https://web.whatsapp.com/",
+    "image": "/uploads/daf7f9b92aa4a4ba29908f90.png",
+    "color": null,
+    "tags": [],
+    "order": 1
+  },
+  {
+    "id": "ee539e0c-0eab-4a0c-afee-f05efee4fd54",
+    "title": "Outlook",
+    "url": "https://www.microsoft.com/pt-br/microsoft-365/outlook/log-in",
+    "image": "/uploads/22152c713ec00aeb789c7711.png",
+    "color": null,
+    "tags": [],
+    "order": 2
+  },
+  {
+    "id": "de225883-334f-4938-a5c8-3ae5afe34d93",
+    "title": "Pasta Inventario",
+    "url": "https://seesp.sharepoint.com/sites/comunicadetec/Documentos%20Compartilhados/Forms/AllItems.aspx?e=5%3A4ca0ac5da2e1454c9a26dea7d88b3f31&sharingv2=true&fromShare=true&at=9&CT=1785777189197&OR=OWA%2DNT%2DMail&CID=bf1262ef%2D1c76%2Daf9f%2D5db0%2D0f466f351063&SI=NonSentItems&SLSync=F&FolderCTID=0x01200065EF3EF078F70741BD381834260BEDAA&id=%2Fsites%2Fcomunicadetec%2FDocumentos%20Compartilhados%2FINVENT%C3%81RIO%20%2D%20URES%2FJALES",
+    "image": "/uploads/5fbfe199fd4f64dc22587aad.png",
+    "color": null,
+    "tags": [],
+    "order": 3
+  },
+  {
+    "id": "93ef4b9a-865d-4892-991a-953871872710",
+    "title": "Equipamentos Entregue",
+    "url": "https://seesp-my.sharepoint.com/:x:/r/personal/jal_seintec_educacao_sp_gov_br/_layouts/15/Doc.aspx?sourcedoc=%7BD0DD70FA-D482-4320-A79B-92FC491A430B%7D&file=Base%20-%20Equipamentos%20Entregues(Base%20Escolas-Equipamentos).xlsx&fromShare=true&action=default&mobileredirect=true",
+    "image": "/uploads/63e82207696ace416c942fee.png",
+    "color": null,
+    "tags": [],
+    "order": 4
+  }
+]

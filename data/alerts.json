@@ -1,0 +1,12 @@
+[
+  {
+    "id": "b94411fb-148a-4cda-9dc5-b4685b99e723",
+    "title": "PORTAL SEI FORA DO AR",
+    "message": "O PORTAL SEI ESTÁ FORA DO AR, ESTAMOS TRABALHNADO PARA ARRUMAR.",
+    "type": "danger",
+    "active": false,
+    "order": 0,
+    "createdAt": "2026-07-29T11:32:37.874Z",
+    "ackCount": 2
+  }
+]

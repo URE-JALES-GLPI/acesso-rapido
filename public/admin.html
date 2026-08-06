@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — Acesso Rápido</title>
+
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+
+<link rel="stylesheet" href="/styles.css?v=14">
+<script>
+  (function () {
+    const saved = localStorage.getItem('acesso-rapido-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  })();
+</script>
+</head>
+<body>
+<div class="network-bg" id="networkBg"></div>
+<div class="ambient-glow"></div>
+
+<!-- ===================== TELA DE LOGIN ===================== -->
+<div class="auth-wrap" id="loginScreen" style="display:none;">
+  <div class="auth-card">
+    <div class="brand">
+      <img class="logo-dark" src="/assets/logo.png" alt="Acesso Rápido" style="height:36px;">
+      <img class="logo-light" src="/assets/logo-light.png" alt="Acesso Rápido" style="height:36px;">
+    </div>
+    <h1>Entrar no painel admin</h1>
+    <div class="error-msg" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+    <a href="/" class="btn btn-secondary" style="width:100%; margin-top:10px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Voltar para o início
+    </a>
+  </div>
+</div>
+
+<!-- ===================== PAINEL ADMIN ===================== -->
+<div id="adminScreen" style="display:none;">
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo-dark" src="/assets/logo.png" alt="Acesso Rápido">
+      <img class="logo-light" src="/assets/logo-light.png" alt="Acesso Rápido">
+    </div>
+    <div class="topbar-actions">
+      <a href="/" class="icon-btn" title="Ver site" aria-label="Ver site">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <a href="/ti.html" class="icon-btn" title="Área de TI" aria-label="Área de TI">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+      </a>
+      <button class="theme-toggle" id="themeToggle" title="Alternar tema" aria-label="Alternar tema">
+        <span class="knob">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </span>
+      </button>
+      <button class="icon-btn" id="logoutBtn" title="Sair" aria-label="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <nav class="admin-sidebar">
+      <button class="sidebar-item active" data-category="acessos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Acessos</span>
+      </button>
+      <button class="sidebar-item" data-category="alertas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span>Alertas</span>
+      </button>
+      <button class="sidebar-item" data-category="usuarios">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>Usuários e Grupos</span>
+      </button>
+      <button class="sidebar-item" data-category="estatisticas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <span>Estatísticas</span>
+      </button>
+    </nav>
+
+    <div class="admin-content">
+      <!-- ---------- CATEGORIA: ACESSOS ---------- -->
+      <section class="admin-category" id="cat-acessos">
+        <div class="panel-card">
+          <h2 id="formTitle">Adicionar novo acesso</h2>
+          <div class="success-msg" id="formSuccess"></div>
+          <div class="error-msg" id="formError"></div>
+          <form id="tileForm">
+            <input type="hidden" id="tileId" value="">
+            <div class="form-grid">
+              <div class="field">
+                <label for="title">Título</label>
+                <input type="text" id="title" name="title" placeholder="Ex: Portainer" required>
+              </div>
+              <div class="field">
+                <label for="url">Link (URL)</label>
+                <input type="text" id="url" name="url" placeholder="https://meusite.com" required>
+              </div>
+              <div class="field full">
+                <label for="tagsInputField">Tags (opcional)</label>
+                <div class="tag-input-wrap" id="tagInputWrap">
+                  <div class="tag-chips" id="tagChips"></div>
+                  <input type="text" id="tagsInputField" placeholder="Digite e aperte Enter...">
+                </div>
+                <div class="hint">Digite uma palavra e aperte Enter (ou vírgula) para criar a tag. Ajuda a encontrar o acesso na busca mesmo que a pessoa não digite o nome exato (ex: alguém busca "acesso remoto" e encontra o Anydesk).</div>
+              </div>
+              <div class="field full">
+                <label>Imagem do quadrado</label>
+                <div class="image-input-row">
+                  <div class="image-preview" id="imagePreview">—</div>
+                  <label class="file-label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    Enviar imagem
+                    <input type="file" id="imageFile" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif">
+                  </label>
+                  <button type="button" class="btn btn-secondary" id="removeImageBtn" style="display:none;">Remover imagem</button>
+                </div>
+                <div class="hint">A imagem se adapta automaticamente ao tamanho do quadrado. Se nenhuma imagem for enviada, mostramos as iniciais do título.</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button type="submit" class="btn btn-primary" style="width:auto; padding-left:24px; padding-right:24px;">Salvar</button>
+              <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Cancelar edição</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h2>Acessos cadastrados</h2>
+          <div class="tile-list" id="tileList"></div>
+        </div>
+      </section>
+
+      <!-- ---------- CATEGORIA: ALERTAS ---------- -->
+      <section class="admin-category" id="cat-alertas" style="display:none;">
+        <div class="panel-card">
+          <h2 id="alertFormTitle">Adicionar novo alerta</h2>
+          <div class="success-msg" id="alertFormSuccess"></div>
+          <div class="error-msg" id="alertFormError"></div>
+          <form id="alertForm">
+            <input type="hidden" id="alertId" value="">
+            <div class="form-grid">
+              <div class="field">
+                <label for="alertTitle">Título (opcional)</label>
+                <input type="text" id="alertTitle" placeholder="Ex: Sistema em manutenção">
+              </div>
+              <div class="field">
+                <label for="alertType">Tipo</label>
+                <select id="alertType">
+                  <option value="info">Informação (azul)</option>
+                  <option value="warning">Aviso (amarelo)</option>
+                  <option value="danger">Crítico (vermelho)</option>
+                  <option value="success">Sucesso (verde)</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="alertMessage">Mensagem</label>
+                <textarea id="alertMessage" rows="3" placeholder="Ex: O sistema SEI está fora do ar para manutenção até às 18h. Pedimos desculpas pelo transtorno."></textarea>
+              </div>
+              <div class="field">
+                <label for="alertStartAt">Começa em (opcional)</label>
+                <input type="datetime-local" id="alertStartAt">
+              </div>
+              <div class="field">
+                <label for="alertEndAt">Termina em (opcional)</label>
+                <input type="datetime-local" id="alertEndAt">
+              </div>
+              <div class="field full">
+                <div class="hint" style="margin-top:-8px; margin-bottom:4px;">Deixe em branco pra controlar manualmente pelo interruptor abaixo. Se preencher, o alerta aparece e some sozinho nos horários definidos, mesmo sem você mexer em nada.</div>
+              </div>
+              <div class="field full">
+                <label class="switch-row">
+                  <span class="switch" id="alertActiveSwitch"><span class="switch-knob"></span></span>
+                  <span>Alerta ativo (aparece na página inicial assim que salvar)</span>
+                </label>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button type="submit" class="btn btn-primary" style="width:auto; padding-left:24px; padding-right:24px;">Salvar alerta</button>
+              <button type="button" class="btn btn-secondary" id="cancelAlertEditBtn" style="display:none;">Cancelar edição</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h2>Alertas cadastrados</h2>
+          <div class="tile-list" id="alertList"></div>
+        </div>
+      </section>
+
+      <!-- ---------- CATEGORIA: USUARIOS E GRUPOS ---------- -->
+      <section class="admin-category" id="cat-usuarios" style="display:none;">
+        <div class="panel-card">
+          <h2 id="groupFormTitle">Adicionar novo grupo</h2>
+          <div class="success-msg" id="groupFormSuccess"></div>
+          <div class="error-msg" id="groupFormError"></div>
+          <form id="groupForm">
+            <input type="hidden" id="groupId" value="">
+            <div class="field">
+              <label for="groupName">Nome do grupo</label>
+              <input type="text" id="groupName" placeholder="Ex: Administradores, Equipe de TI" required>
+            </div>
+            <div class="field">
+              <label style="margin-bottom:10px;">Permissões deste grupo</label>
+              <label class="switch-row" style="margin-bottom:10px;">
+                <span class="switch" id="groupPermAdminSwitch"><span class="switch-knob"></span></span>
+                <span>Painel Admin (gerenciar acessos, alertas, usuários e estatísticas)</span>
+              </label>
+              <label class="switch-row">
+                <span class="switch" id="groupPermTiSwitch"><span class="switch-knob"></span></span>
+                <span>Painel de TI (atalhos e anotações da equipe técnica)</span>
+              </label>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button type="submit" class="btn btn-primary" style="width:auto; padding-left:24px; padding-right:24px;">Salvar grupo</button>
+              <button type="button" class="btn btn-secondary" id="cancelGroupEditBtn" style="display:none;">Cancelar edição</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h2>Grupos cadastrados</h2>
+          <div class="tile-list" id="groupList"></div>
+        </div>
+
+        <div class="panel-card">
+          <h2 id="userFormTitle">Adicionar novo usuário</h2>
+          <div class="success-msg" id="userFormSuccess"></div>
+          <div class="error-msg" id="userFormError"></div>
+          <form id="userForm">
+            <input type="hidden" id="userId" value="">
+            <div class="form-grid">
+              <div class="field">
+                <label for="userUsername">Usuário</label>
+                <input type="text" id="userUsername" placeholder="Ex: ti, joao.silva" required>
+              </div>
+              <div class="field">
+                <label for="userGroupId">Grupo</label>
+                <select id="userGroupId"></select>
+              </div>
+              <div class="field full">
+                <label for="userPassword">Senha</label>
+                <input type="password" id="userPassword" placeholder="Mínimo 4 caracteres">
+                <div class="hint" id="userPasswordHint">Ao editar, deixe em branco para manter a senha atual.</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button type="submit" class="btn btn-primary" style="width:auto; padding-left:24px; padding-right:24px;">Salvar usuário</button>
+              <button type="button" class="btn btn-secondary" id="cancelUserEditBtn" style="display:none;">Cancelar edição</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h2>Usuários cadastrados</h2>
+          <div class="tile-list" id="userList"></div>
+        </div>
+      </section>
+
+      <!-- ---------- CATEGORIA: ESTATISTICAS ---------- -->
+      <section class="admin-category" id="cat-estatisticas" style="display:none;">
+        <div class="panel-card">
+          <h2>Cliques ao longo do tempo (últimos 14 dias)</h2>
+          <canvas id="clicksChart" height="180"></canvas>
+        </div>
+
+        <div class="panel-card">
+          <h2>Mais acessados</h2>
+          <div class="tile-list" id="rankingList"></div>
+        </div>
+
+        <div class="panel-card">
+          <h2>Histórico de cliques</h2>
+          <div class="scroll-list" id="clicksHistoryList"></div>
+        </div>
+
+        <div class="panel-card">
+          <h2>Histórico de buscas</h2>
+          <div class="scroll-list" id="searchesHistoryList"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="/network-bg.js?v=13"></script>
+<script src="/trim-image.js?v=13"></script>
+<script src="/admin.js?v=13"></script>
+</body>
+</html>

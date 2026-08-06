@@ -1,0 +1,60 @@
+[
+  {
+    "id": "104f2e9c-2a77-47b3-8331-3f0e14af886b",
+    "title": "Chamados",
+    "url": "http://10.180.152.27/",
+    "image": "/uploads/c7115c5dc001e08a8f52e0ce.png",
+    "color": null,
+    "order": 0,
+    "tags": [
+      "[\"[\\\"[\\\\\\\"[\\\\\\\\\\\\\\\"focus\\\\\\\\\\\\\\\"\\\\\\\"\\\"\"",
+      "\"\\\"\\\\\\\"\\\\\\\\\\\\\\\"bala\\\\\\\\\\\\\\\"\\\\\\\"\\\"\"",
+      "\"\\\"\\\\\\\"\\\\\\\\\\\\\\\"prata\\\\\\\\\\\\\\\"]\\\\\\\"]\\\"]\"]"
+    ]
+  },
+  {
+    "id": "92e6cdc4-277e-4d19-9a5f-4855e010678b",
+    "title": "SEI",
+    "url": "https://www.portal.sei.sp.gov.br/sei",
+    "image": "/uploads/5e1e65a79f4d36586e28503f.png",
+    "color": null,
+    "order": 1,
+    "tags": [
+      "[\"cei\"]"
+    ]
+  },
+  {
+    "id": "9419192a-186c-430a-83e0-8099bcce887a",
+    "title": "Anydesk",
+    "url": "https://anydesk.com/pt",
+    "image": "/uploads/d3abd6554b8ce83e53a5f109.png",
+    "color": null,
+    "order": 2,
+    "tags": [
+      "[\"[\\\"[\\\\\\\"acesso remoto\\\\\\\"\\\"\"",
+      "\"\\\"\\\\\\\"jesus\\\\\\\"\\\"\"",
+      "\"\\\"\\\\\\\"enidesk\\\\\\\"\\\"\"",
+      "\"\\\"\\\\\\\"anidesk\\\\\\\"]\\\"]\"]"
+    ]
+  },
+  {
+    "id": "439e636b-7666-41e7-89f1-8ba33f803fcb",
+    "title": "Sala do Futuro",
+    "url": "https://saladofuturo.educacao.sp.gov.br/",
+    "image": "/uploads/aa795e252a45a2a72996f39a.png",
+    "color": null,
+    "order": 3,
+    "tags": [
+      "[]"
+    ]
+  },
+  {
+    "id": "cdd99438-db82-4c54-854f-e84a83e03410",
+    "title": "SED",
+    "url": "https://sed.educacao.sp.gov.br/",
+    "image": "/uploads/5b84106c97c85fec824a2ab5.png",
+    "color": null,
+    "tags": [],
+    "order": 4
+  }
+]
