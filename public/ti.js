@@ -539,6 +539,8 @@ function groupNamesForNote(note) {
   return names.length ? 'Visível para: ' + names.join(', ') : 'Visível para todos os grupos com acesso à TI';
 }
 
+const expandedNoteIds = new Set();
+
 function renderNotesList() {
   notesListEl.innerHTML = '';
   const term = (document.getElementById('noteSearchInput').value || '').trim().toLowerCase();
@@ -555,26 +557,46 @@ function renderNotesList() {
     return;
   }
   list.forEach(note => {
+    const isExpanded = expandedNoteIds.has(note.id);
     const card = document.createElement('div');
     card.className = 'panel-card note-card';
     const dateStr = new Date(note.updatedAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const attachmentsHtml = note.attachments && note.attachments.length
+      ? `<div class="attachment-grid">${note.attachments.map(a => attachmentPreviewHtml(a, false)).join('')}</div>`
+      : '';
     card.innerHTML = `
       <div class="note-card-header">
         <div>
           ${note.title ? `<h2 style="margin-bottom:4px;">${escapeHtml(note.title)}</h2>` : ''}
-          <div class="hint">Por ${escapeHtml(note.author || '—')} · atualizado em ${dateStr}</div>
+          <div class="hint">Por ${escapeHtml(note.author || '—')} · atualizado em ${dateStr}${note.attachments && note.attachments.length ? ` · 📎 ${note.attachments.length}` : ''}</div>
         </div>
-        <div class="actions manage-only">
-          <button class="note-edit-btn" title="Editar">${iconSvg('edit')}</button>
-          <button class="note-delete-btn" title="Excluir">${iconSvg('trash')}</button>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <button class="note-toggle-btn" title="${isExpanded ? 'Recolher' : 'Expandir'}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${isExpanded ? '180' : '0'}deg); transition: transform 0.15s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <span>${isExpanded ? 'Recolher' : 'Expandir'}</span>
+          </button>
+          <div class="actions manage-only">
+            <button class="note-edit-btn" title="Editar">${iconSvg('edit')}</button>
+            <button class="note-delete-btn" title="Excluir">${iconSvg('trash')}</button>
+          </div>
         </div>
       </div>
-      <div class="note-content">${escapeHtml(note.content)}</div>
-      ${note.attachments && note.attachments.length ? `<div class="attachment-grid">${note.attachments.map(a => attachmentPreviewHtml(a, false)).join('')}</div>` : ''}
-      <div class="note-visibility-tag manage-only">${escapeHtml(groupNamesForNote(note))}</div>
+      <div class="note-content ${isExpanded ? '' : 'collapsed'}">${escapeHtml(note.content)}</div>
+      <div class="note-extra" style="${isExpanded ? '' : 'display:none;'}">
+        ${attachmentsHtml}
+        <div class="note-visibility-tag manage-only">${escapeHtml(groupNamesForNote(note))}</div>
+      </div>
     `;
     card.querySelector('.note-edit-btn').addEventListener('click', () => editNote(note));
     card.querySelector('.note-delete-btn').addEventListener('click', () => deleteNote(note));
+    card.querySelector('.note-toggle-btn').addEventListener('click', () => {
+      if (expandedNoteIds.has(note.id)) {
+        expandedNoteIds.delete(note.id);
+      } else {
+        expandedNoteIds.add(note.id);
+      }
+      renderNotesList();
+    });
     notesListEl.appendChild(card);
   });
 }

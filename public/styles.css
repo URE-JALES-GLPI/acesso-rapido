@@ -983,6 +983,32 @@ html[data-theme="light"] .tile { box-shadow: 0 2px 10px rgba(30, 50, 80, 0.06); 
   color: var(--text);
   margin-bottom: 12px;
 }
+.note-content.collapsed {
+  max-height: 66px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 4px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 65%, transparent 100%);
+}
+.note-extra { margin-top: 4px; }
+
+.note-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated-2);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.note-toggle-btn:hover { color: var(--text); border-color: var(--accent-1); }
+.note-toggle-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 .attachment-grid {
   display: grid;
