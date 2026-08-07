@@ -1083,6 +1083,104 @@ app.use((err, req, res, next) => {
   next();
 });
 
+// =====================================================
+// VERIFICACAO DE LINKS QUEBRADOS
+// =====================================================
+const LINK_STATUS_FILE = path.join(DATA_DIR, 'link-status.json');
+if (!fs.existsSync(LINK_STATUS_FILE)) {
+  fs.writeFileSync(LINK_STATUS_FILE, JSON.stringify({}, null, 2));
+}
+function readLinkStatus() {
+  try {
+    return JSON.parse(fs.readFileSync(LINK_STATUS_FILE, 'utf8') || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+function writeLinkStatus(statusMap) {
+  fs.writeFileSync(LINK_STATUS_FILE, JSON.stringify(statusMap, null, 2));
+}
+
+// tenta checar uma URL com HEAD (mais leve); se o servidor nao aceitar, tenta GET
+async function checkOneUrl(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+  try {
+    let res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
+    if (res.status === 405 || res.status === 501) {
+      res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+    }
+    clearTimeout(timeout);
+    return { status: res.status < 400 ? 'ok' : 'broken', httpStatus: res.status };
+  } catch (e) {
+    clearTimeout(timeout);
+    return { status: 'broken', httpStatus: null };
+  }
+}
+
+// checa uma lista de tiles em lotes pequenos (evita sobrecarregar a rede) e salva o resultado
+async function checkTilesLinks(tiles, scope) {
+  const statusMap = readLinkStatus();
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < tiles.length; i += BATCH_SIZE) {
+    const batch = tiles.slice(i, i + BATCH_SIZE);
+    const results = await Promise.all(batch.map(t => checkOneUrl(t.url)));
+    batch.forEach((tile, idx) => {
+      statusMap[`${scope}:${tile.id}`] = {
+        ...results[idx],
+        checkedAt: new Date().toISOString()
+      };
+    });
+  }
+  writeLinkStatus(statusMap);
+  return statusMap;
+}
+
+function linkStatusForScope(scope) {
+  const statusMap = readLinkStatus();
+  const out = {};
+  Object.keys(statusMap).forEach(key => {
+    if (key.startsWith(scope + ':')) out[key.slice(scope.length + 1)] = statusMap[key];
+  });
+  return out;
+}
+
+app.get('/api/tiles/link-status', requireAdmin, (req, res) => {
+  res.json(linkStatusForScope('main'));
+});
+app.post('/api/tiles/check-links', requireAdmin, async (req, res) => {
+  try {
+    await checkTilesLinks(readTiles(), 'main');
+    res.json(linkStatusForScope('main'));
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao verificar links' });
+  }
+});
+
+app.get('/api/ti/tiles/link-status', requireStaff, (req, res) => {
+  res.json(linkStatusForScope('ti'));
+});
+app.post('/api/ti/tiles/check-links', requireStaff, async (req, res) => {
+  try {
+    await checkTilesLinks(readTiTiles(), 'ti');
+    res.json(linkStatusForScope('ti'));
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao verificar links' });
+  }
+});
+
+// verificacao automatica periodica (a cada 30 minutos), sem depender de ninguem clicar
+const LINK_CHECK_INTERVAL = 30 * 60 * 1000;
+setInterval(() => {
+  checkTilesLinks(readTiles(), 'main').catch(() => {});
+  checkTilesLinks(readTiTiles(), 'ti').catch(() => {});
+}, LINK_CHECK_INTERVAL);
+// primeira checagem automatica pouco depois de iniciar (nao trava o boot do servidor)
+setTimeout(() => {
+  checkTilesLinks(readTiles(), 'main').catch(() => {});
+  checkTilesLinks(readTiTiles(), 'ti').catch(() => {});
+}, 15000);
+
 app.listen(PORT, () => {
   console.log(`Acesso Rapido rodando em http://localhost:${PORT}`);
 });

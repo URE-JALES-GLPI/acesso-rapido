@@ -246,6 +246,15 @@ function iconSvg(name) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
 }
 
+let linkStatusCache = {};
+
+function linkStatusDot(tileId) {
+  const s = linkStatusCache[tileId];
+  if (!s) return '<span class="link-dot link-dot-unknown" title="Ainda não verificado"></span>';
+  if (s.status === 'ok') return `<span class="link-dot link-dot-ok" title="Link OK (${s.httpStatus})"></span>`;
+  return `<span class="link-dot link-dot-broken" title="Link pode estar fora do ar${s.httpStatus ? ' (' + s.httpStatus + ')' : ''}"></span>`;
+}
+
 function renderTileList() {
   tileList.innerHTML = '';
   if (!tilesCache.length) {
@@ -277,7 +286,7 @@ function renderTileList() {
     const tagsHtml = (tile.tags && tile.tags.length)
       ? `<div class="t-url">🏷️ ${escapeHtml(tile.tags.join(', '))}</div>`
       : '';
-    info.innerHTML = `<div class="t-title">${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div>${tagsHtml}`;
+    info.innerHTML = `<div class="t-title">${linkStatusDot(tile.id)}${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div>${tagsHtml}`;
 
     const moveBtns = document.createElement('div');
     moveBtns.className = 'move-btns';
@@ -328,8 +337,33 @@ async function loadTileList() {
   const res = await fetch('/api/tiles');
   tilesCache = await res.json();
   tilesCache.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  try {
+    const statusRes = await fetch('/api/tiles/link-status');
+    linkStatusCache = await statusRes.json();
+  } catch (e) { /* ignora */ }
   renderTileList();
 }
+
+const checkLinksBtn = document.getElementById('checkLinksBtn');
+const linkCheckHint = document.getElementById('linkCheckHint');
+checkLinksBtn.addEventListener('click', async () => {
+  checkLinksBtn.disabled = true;
+  checkLinksBtn.textContent = 'Verificando...';
+  linkCheckHint.textContent = 'Isso pode levar alguns segundos, dependendo de quantos acessos você tem.';
+  try {
+    const res = await fetch('/api/tiles/check-links', { method: 'POST' });
+    linkStatusCache = await res.json();
+    renderTileList();
+    const brokenCount = Object.values(linkStatusCache).filter(s => s.status === 'broken').length;
+    linkCheckHint.textContent = brokenCount
+      ? `Verificação concluída: ${brokenCount} link(s) parecem fora do ar.`
+      : 'Verificação concluída: todos os links responderam normalmente.';
+  } catch (e) {
+    linkCheckHint.textContent = 'Não foi possível verificar os links agora.';
+  }
+  checkLinksBtn.disabled = false;
+  checkLinksBtn.textContent = 'Verificar links';
+});
 
 function editTile(tile) {
   tileIdInput.value = tile.id;

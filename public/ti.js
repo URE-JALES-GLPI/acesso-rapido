@@ -191,6 +191,15 @@ tiTileForm.addEventListener('submit', async (e) => {
   }
 });
 
+let tiLinkStatusCache = {};
+
+function tiLinkStatusDot(tileId) {
+  const s = tiLinkStatusCache[tileId];
+  if (!s) return '<span class="link-dot link-dot-unknown" title="Ainda não verificado"></span>';
+  if (s.status === 'ok') return `<span class="link-dot link-dot-ok" title="Link OK (${s.httpStatus})"></span>`;
+  return `<span class="link-dot link-dot-broken" title="Link pode estar fora do ar${s.httpStatus ? ' (' + s.httpStatus + ')' : ''}"></span>`;
+}
+
 function renderTiTileList() {
   tiTileList.innerHTML = '';
   if (!tiTilesCache.length) {
@@ -212,7 +221,7 @@ function renderTiTileList() {
     info.rel = 'noopener noreferrer';
     info.style.textDecoration = 'none';
     info.style.color = 'inherit';
-    info.innerHTML = `<div class="t-title">${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div>`;
+    info.innerHTML = `<div class="t-title">${tiLinkStatusDot(tile.id)}${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div>`;
     info.addEventListener('click', () => {
       fetch('/api/ti/track/click', {
         method: 'POST',
@@ -245,10 +254,37 @@ function renderTiTileList() {
 async function loadTiTiles() {
   const res = await fetch('/api/ti/tiles');
   tiTilesCache = await res.json();
+  try {
+    const statusRes = await fetch('/api/ti/tiles/link-status');
+    tiLinkStatusCache = await statusRes.json();
+  } catch (e) { /* ignora */ }
   renderTiTileGrid();
   renderTiTileList();
   loadTiStats();
 }
+
+document.getElementById('tiTileSearchInput').addEventListener('input', renderTiTileGrid);
+
+const tiCheckLinksBtn = document.getElementById('tiCheckLinksBtn');
+const tiLinkCheckHint = document.getElementById('tiLinkCheckHint');
+tiCheckLinksBtn.addEventListener('click', async () => {
+  tiCheckLinksBtn.disabled = true;
+  tiCheckLinksBtn.textContent = 'Verificando...';
+  tiLinkCheckHint.textContent = 'Isso pode levar alguns segundos.';
+  try {
+    const res = await fetch('/api/ti/tiles/check-links', { method: 'POST' });
+    tiLinkStatusCache = await res.json();
+    renderTiTileList();
+    const brokenCount = Object.values(tiLinkStatusCache).filter(s => s.status === 'broken').length;
+    tiLinkCheckHint.textContent = brokenCount
+      ? `Verificação concluída: ${brokenCount} link(s) parecem fora do ar.`
+      : 'Verificação concluída: todos os links responderam normalmente.';
+  } catch (e) {
+    tiLinkCheckHint.textContent = 'Não foi possível verificar os links agora.';
+  }
+  tiCheckLinksBtn.disabled = false;
+  tiCheckLinksBtn.textContent = 'Verificar links';
+});
 
 function trackTiClick(tileId) {
   fetch('/api/ti/track/click', {
@@ -261,12 +297,19 @@ function trackTiClick(tileId) {
 
 function renderTiTileGrid() {
   const grid = document.getElementById('tiTileGrid');
+  const term = (document.getElementById('tiTileSearchInput').value || '').trim().toLowerCase();
+  const list = term ? tiTilesCache.filter(t => (t.title || '').toLowerCase().includes(term)) : tiTilesCache;
+
   grid.innerHTML = '';
   if (!tiTilesCache.length) {
     grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum atalho cadastrado ainda</div><div>Clique na ferramenta no topo para adicionar o primeiro.</div></div>';
     return;
   }
-  tiTilesCache.forEach(tile => {
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div></div>';
+    return;
+  }
+  list.forEach(tile => {
     const a = document.createElement('a');
     a.className = 'tile';
     a.href = tile.url;
@@ -498,11 +541,20 @@ function groupNamesForNote(note) {
 
 function renderNotesList() {
   notesListEl.innerHTML = '';
+  const term = (document.getElementById('noteSearchInput').value || '').trim().toLowerCase();
+  const list = term
+    ? notesCache.filter(n => (n.title || '').toLowerCase().includes(term) || (n.content || '').toLowerCase().includes(term))
+    : notesCache;
+
   if (!notesCache.length) {
     notesListEl.innerHTML = '<div class="panel-card"><div class="empty-admin">Nenhuma anotação ainda. Clique na ferramenta no topo para criar a primeira.</div></div>';
     return;
   }
-  notesCache.forEach(note => {
+  if (!list.length) {
+    notesListEl.innerHTML = '<div class="panel-card"><div class="empty-admin">Nenhum resultado encontrado.</div></div>';
+    return;
+  }
+  list.forEach(note => {
     const card = document.createElement('div');
     card.className = 'panel-card note-card';
     const dateStr = new Date(note.updatedAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -524,22 +576,6 @@ function renderNotesList() {
     card.querySelector('.note-edit-btn').addEventListener('click', () => editNote(note));
     card.querySelector('.note-delete-btn').addEventListener('click', () => deleteNote(note));
     notesListEl.appendChild(card);
-
-    const contentEl = card.querySelector('.note-content');
-    contentEl.classList.add('collapsed');
-    if (contentEl.scrollHeight > contentEl.clientHeight) {
-      const toggleBtn = document.createElement('button');
-      toggleBtn.type = 'button';
-      toggleBtn.className = 'note-toggle';
-      toggleBtn.textContent = 'Expandir';
-      toggleBtn.addEventListener('click', () => {
-        const collapsed = contentEl.classList.toggle('collapsed');
-        toggleBtn.textContent = collapsed ? 'Expandir' : 'Recolher';
-      });
-      contentEl.after(toggleBtn);
-    } else {
-      contentEl.classList.remove('collapsed');
-    }
   });
 }
 
@@ -548,6 +584,8 @@ async function loadNotes() {
   notesCache = await res.json();
   renderNotesList();
 }
+
+document.getElementById('noteSearchInput').addEventListener('input', renderNotesList);
 
 function editNote(note) {
   noteIdInput.value = note.id;
