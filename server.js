@@ -793,12 +793,15 @@ function writeTiTiles(tiles) {
 }
 
 app.get('/api/ti/tiles', requireStaff, (req, res) => {
-  const tiles = readTiTiles().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const myGroupId = req.session.groupId;
+  const tiles = readTiTiles()
+    .filter(t => !t.visibleGroupIds || t.visibleGroupIds.length === 0 || t.visibleGroupIds.includes(myGroupId))
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   res.json(tiles);
 });
 
 app.post('/api/ti/tiles', requireStaff, upload.single('image'), (req, res) => {
-  const { title, url, color, imageUrl, tags } = req.body;
+  const { title, url, color, imageUrl, tags, visibleGroupIds } = req.body;
   if (!title || !url) {
     return res.status(400).json({ error: 'Titulo e URL sao obrigatorios' });
   }
@@ -812,6 +815,14 @@ app.post('/api/ti/tiles', requireStaff, upload.single('image'), (req, res) => {
     image = imageUrl;
   }
 
+  let parsedGroupIds = [];
+  if (visibleGroupIds) {
+    try {
+      const parsed = JSON.parse(visibleGroupIds);
+      if (Array.isArray(parsed)) parsedGroupIds = parsed;
+    } catch (e) { /* ignora */ }
+  }
+
   const tile = {
     id: crypto.randomUUID(),
     title,
@@ -819,6 +830,7 @@ app.post('/api/ti/tiles', requireStaff, upload.single('image'), (req, res) => {
     image,
     color: color || null,
     tags: parseTags(tags),
+    visibleGroupIds: parsedGroupIds,
     order: maxOrder + 1
   };
   tiles.push(tile);
@@ -832,13 +844,19 @@ app.put('/api/ti/tiles/:id', requireStaff, upload.single('image'), (req, res) =>
   const idx = tiles.findIndex(t => t.id === id);
   if (idx === -1) return res.status(404).json({ error: 'Tile nao encontrado' });
 
-  const { title, url, color, imageUrl, removeImage, tags } = req.body;
+  const { title, url, color, imageUrl, removeImage, tags, visibleGroupIds } = req.body;
   const tile = tiles[idx];
 
   if (title !== undefined) tile.title = title;
   if (url !== undefined) tile.url = normalizeUrl(url);
   if (color !== undefined) tile.color = color || null;
   if (tags !== undefined) tile.tags = parseTags(tags);
+  if (visibleGroupIds !== undefined) {
+    try {
+      const parsed = JSON.parse(visibleGroupIds);
+      if (Array.isArray(parsed)) tile.visibleGroupIds = parsed;
+    } catch (e) { /* ignora */ }
+  }
 
   if (req.file) {
     if (tile.image && tile.image.startsWith('/uploads/')) {

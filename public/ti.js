@@ -58,7 +58,8 @@ async function checkSession() {
     mySessionGroupId = data.groupId || null;
     loadTiTiles();
     loadNotes();
-    loadNoteGroupsChecklist();
+    loadGroupChecklists();
+    loadHomeTiles();
   } else {
     loginScreen.style.display = 'flex';
     tiScreen.style.display = 'none';
@@ -89,7 +90,75 @@ loginForm.addEventListener('submit', async (e) => {
       loginError.classList.add('show');
       return;
     }
-    checkSession();
+// =====================================================
+// SITES DA PAGINA INICIAL (replicacao na area de TI)
+// =====================================================
+let homeTilesCache = [];
+
+async function loadHomeTiles() {
+  const res = await fetch('/api/tiles');
+  homeTilesCache = await res.json();
+  renderHomeTileGrid();
+}
+
+document.getElementById('homeTileSearchInput').addEventListener('input', renderHomeTileGrid);
+
+function renderHomeTileGrid() {
+  const grid = document.getElementById('homeTileGrid');
+  const term = (document.getElementById('homeTileSearchInput').value || '').trim().toLowerCase();
+  const list = term ? homeTilesCache.filter(t => (t.title || '').toLowerCase().includes(term)) : homeTilesCache;
+
+  grid.innerHTML = '';
+  if (!homeTilesCache.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum site cadastrado na página inicial</div><div>Os atalhos da home aparecerão aqui.</div></div>';
+    return;
+  }
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div></div>';
+    return;
+  }
+  list.forEach(tile => {
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = tile.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = tile.title;
+
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'tile-image-wrap';
+    if (tile.image) {
+      const img = document.createElement('img');
+      img.src = tile.image;
+      img.alt = tile.title;
+      img.loading = 'lazy';
+      imageWrap.appendChild(img);
+    } else {
+      const fallback = document.createElement('div');
+      fallback.className = 'tile-fallback';
+      fallback.textContent = (tile.title || '?').slice(0, 2).toUpperCase();
+      imageWrap.appendChild(fallback);
+    }
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'tile-title';
+    titleEl.textContent = tile.title;
+
+    a.appendChild(imageWrap);
+    a.appendChild(titleEl);
+    a.addEventListener('click', () => {
+      fetch('/api/track/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tileId: tile.id }),
+        keepalive: true
+      }).catch(() => {});
+    });
+    grid.appendChild(a);
+  });
+}
+
+checkSession();
   } catch (err) {
     loginError.textContent = 'Erro de conexão. Tente novamente.';
     loginError.classList.add('show');
@@ -144,6 +213,7 @@ function resetTiTileForm() {
   tiImagePreview.innerHTML = '—';
   tiRemoveImageBtn.style.display = 'none';
   tiRemoveImageFlag = false;
+  setSelectedGroupIds([], '.tile-group-checkbox');
   tiTileFormTitle.textContent = 'Adicionar novo site';
   tiCancelEditBtn.style.display = 'none';
 }
@@ -168,6 +238,7 @@ tiTileForm.addEventListener('submit', async (e) => {
   const formData = new FormData();
   formData.append('title', tiTitleInput.value.trim());
   formData.append('url', tiUrlInput.value.trim());
+  formData.append('visibleGroupIds', JSON.stringify(getSelectedGroupIds('.tile-group-checkbox')));
   if (tiImageFileInput.files[0]) {
     formData.append('image', tiImageFileInput.files[0]);
   } else if (tiRemoveImageFlag) {
@@ -200,6 +271,15 @@ function tiLinkStatusDot(tileId) {
   return `<span class="link-dot link-dot-broken" title="Link pode estar fora do ar${s.httpStatus ? ' (' + s.httpStatus + ')' : ''}"></span>`;
 }
 
+function groupNamesForTile(tile) {
+  if (!tile.visibleGroupIds || !tile.visibleGroupIds.length) return 'Visível para todos os grupos com acesso à TI';
+  const names = tile.visibleGroupIds.map(id => {
+    const g = ti_groupsCache.find(g => g.id === id);
+    return g ? g.name : null;
+  }).filter(Boolean);
+  return names.length ? 'Visível para: ' + names.join(', ') : 'Visível para todos os grupos com acesso à TI';
+}
+
 function renderTiTileList() {
   tiTileList.innerHTML = '';
   if (!tiTilesCache.length) {
@@ -221,7 +301,7 @@ function renderTiTileList() {
     info.rel = 'noopener noreferrer';
     info.style.textDecoration = 'none';
     info.style.color = 'inherit';
-    info.innerHTML = `<div class="t-title">${tiLinkStatusDot(tile.id)}${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div>`;
+    info.innerHTML = `<div class="t-title">${tiLinkStatusDot(tile.id)}${escapeHtml(tile.title)}</div><div class="t-url">${escapeHtml(tile.url)}</div><div class="note-visibility-tag manage-only">${escapeHtml(groupNamesForTile(tile))}</div>`;
     info.addEventListener('click', () => {
       fetch('/api/ti/track/click', {
         method: 'POST',
@@ -402,6 +482,7 @@ function editTiTile(tile) {
   tiImagePreview.innerHTML = tile.image ? `<img src="${tile.image}" alt="preview">` : '—';
   tiRemoveImageBtn.style.display = tile.image ? 'inline-flex' : 'none';
   tiRemoveImageFlag = false;
+  setSelectedGroupIds(tile.visibleGroupIds || [], '.tile-group-checkbox');
   tiTileFormTitle.textContent = 'Editar site';
   tiCancelEditBtn.style.display = 'inline-flex';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -433,30 +514,36 @@ let notesCache = [];
 let removeAttachmentIds = [];
 let ti_groupsCache = [];
 
-async function loadNoteGroupsChecklist() {
+async function loadGroupChecklists() {
   try {
     const res = await fetch('/api/ti/groups');
     ti_groupsCache = await res.json();
-    const el = document.getElementById('noteGroupsChecklist');
-    if (!ti_groupsCache.length) {
-      el.innerHTML = '<div class="hint">Nenhum outro grupo com acesso à TI além do seu.</div>';
-      return;
-    }
-    el.innerHTML = ti_groupsCache.map(g => `
-      <label>
-        <input type="checkbox" class="note-group-checkbox" value="${g.id}">
-        <span>${escapeHtml(g.name)}</span>
-      </label>`).join('');
+    const noteEl = document.getElementById('noteGroupsChecklist');
+    const tileEl = document.getElementById('tiTileGroupsChecklist');
+    if (noteEl) renderGroupChecklist(noteEl, 'note-group-checkbox');
+    if (tileEl) renderGroupChecklist(tileEl, 'tile-group-checkbox');
   } catch (e) {
     // ignora silenciosamente
   }
 }
 
-function getSelectedGroupIds() {
-  return Array.from(document.querySelectorAll('.note-group-checkbox:checked')).map(cb => cb.value);
+function renderGroupChecklist(el, cls) {
+  if (!ti_groupsCache.length) {
+    el.innerHTML = '<div class="hint">Nenhum outro grupo com acesso à TI além do seu.</div>';
+    return;
+  }
+  el.innerHTML = ti_groupsCache.map(g => `
+    <label>
+      <input type="checkbox" class="${cls}" value="${g.id}">
+      <span>${escapeHtml(g.name)}</span>
+    </label>`).join('');
 }
-function setSelectedGroupIds(ids) {
-  document.querySelectorAll('.note-group-checkbox').forEach(cb => {
+
+function getSelectedGroupIds(cls) {
+  return Array.from(document.querySelectorAll(`${cls}:checked`)).map(cb => cb.value);
+}
+function setSelectedGroupIds(ids, cls) {
+  document.querySelectorAll(cls).forEach(cb => {
     cb.checked = (ids || []).includes(cb.value);
   });
 }
@@ -472,7 +559,7 @@ function resetNoteForm() {
   notePendingFiles.textContent = '';
   existingAttachmentsEl.innerHTML = '';
   removeAttachmentIds = [];
-  setSelectedGroupIds([]);
+  setSelectedGroupIds([], '.note-group-checkbox');
   noteFormTitle.textContent = 'Nova anotação';
   noteCancelEditBtn.style.display = 'none';
 }
@@ -497,7 +584,7 @@ noteForm.addEventListener('submit', async (e) => {
   const formData = new FormData();
   formData.append('title', noteTitleInput.value.trim());
   formData.append('content', noteContentInput.value.trim());
-  formData.append('visibleGroupIds', JSON.stringify(getSelectedGroupIds()));
+  formData.append('visibleGroupIds', JSON.stringify(getSelectedGroupIds('.note-group-checkbox')));
   Array.from(noteFilesInput.files).forEach(file => formData.append('attachments', file));
   if (removeAttachmentIds.length) formData.append('removeAttachmentIds', JSON.stringify(removeAttachmentIds));
 
@@ -616,7 +703,7 @@ function editNote(note) {
   noteFilesInput.value = '';
   notePendingFiles.textContent = '';
   removeAttachmentIds = [];
-  setSelectedGroupIds(note.visibleGroupIds || []);
+  setSelectedGroupIds(note.visibleGroupIds || [], '.note-group-checkbox');
 
   existingAttachmentsEl.innerHTML = (note.attachments || []).map(a => attachmentPreviewHtml(a, true)).join('');
   existingAttachmentsEl.querySelectorAll('.attachment-remove').forEach(btn => {

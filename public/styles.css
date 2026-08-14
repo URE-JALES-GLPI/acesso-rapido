@@ -1185,6 +1185,32 @@ html[data-theme="light"] .tile { box-shadow: 0 2px 10px rgba(30, 50, 80, 0.06); 
   margin-top: 8px;
 }
 
+/* ---------- replicacao dos sites da pagina inicial na area de TI ---------- */
+.ti-home-section {
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+.ti-home-section .tile-grid {
+  grid-template-columns: repeat(auto-fill, 100px);
+  justify-content: start;
+  margin-top: 16px;
+}
+.ti-home-section .tile {
+  aspect-ratio: auto;
+  min-height: 112px;
+}
+.ti-home-section .tile .tile-image-wrap {
+  width: 60px;
+  height: 60px;
+  padding: 4%;
+}
+@media (max-width: 900px) {
+  .ti-home-section { padding: 0 16px 60px; }
+}
+
 .hint {
   font-size: 0.78rem;
   color: var(--text-muted);
