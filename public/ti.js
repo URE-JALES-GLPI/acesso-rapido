@@ -90,75 +90,7 @@ loginForm.addEventListener('submit', async (e) => {
       loginError.classList.add('show');
       return;
     }
-// =====================================================
-// SITES DA PAGINA INICIAL (replicacao na area de TI)
-// =====================================================
-let homeTilesCache = [];
-
-async function loadHomeTiles() {
-  const res = await fetch('/api/tiles');
-  homeTilesCache = await res.json();
-  renderHomeTileGrid();
-}
-
-document.getElementById('homeTileSearchInput').addEventListener('input', renderHomeTileGrid);
-
-function renderHomeTileGrid() {
-  const grid = document.getElementById('homeTileGrid');
-  const term = (document.getElementById('homeTileSearchInput').value || '').trim().toLowerCase();
-  const list = term ? homeTilesCache.filter(t => (t.title || '').toLowerCase().includes(term)) : homeTilesCache;
-
-  grid.innerHTML = '';
-  if (!homeTilesCache.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum site cadastrado na página inicial</div><div>Os atalhos da home aparecerão aqui.</div></div>';
-    return;
-  }
-  if (!list.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div></div>';
-    return;
-  }
-  list.forEach(tile => {
-    const a = document.createElement('a');
-    a.className = 'tile';
-    a.href = tile.url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.title = tile.title;
-
-    const imageWrap = document.createElement('div');
-    imageWrap.className = 'tile-image-wrap';
-    if (tile.image) {
-      const img = document.createElement('img');
-      img.src = tile.image;
-      img.alt = tile.title;
-      img.loading = 'lazy';
-      imageWrap.appendChild(img);
-    } else {
-      const fallback = document.createElement('div');
-      fallback.className = 'tile-fallback';
-      fallback.textContent = (tile.title || '?').slice(0, 2).toUpperCase();
-      imageWrap.appendChild(fallback);
-    }
-
-    const titleEl = document.createElement('div');
-    titleEl.className = 'tile-title';
-    titleEl.textContent = tile.title;
-
-    a.appendChild(imageWrap);
-    a.appendChild(titleEl);
-    a.addEventListener('click', () => {
-      fetch('/api/track/click', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tileId: tile.id }),
-        keepalive: true
-      }).catch(() => {});
-    });
-    grid.appendChild(a);
-  });
-}
-
-checkSession();
+    checkSession();
   } catch (err) {
     loginError.textContent = 'Erro de conexão. Tente novamente.';
     loginError.classList.add('show');
@@ -723,6 +655,74 @@ async function deleteNote(note) {
   if (!confirm('Excluir esta anotação e todos os anexos dela?')) return;
   await fetch(`/api/ti/notes/${note.id}`, { method: 'DELETE' });
   loadNotes();
+}
+
+// =====================================================
+// SITES DA PAGINA INICIAL (replicacao na area de TI)
+// =====================================================
+let homeTilesCache = [];
+
+async function loadHomeTiles() {
+  const res = await fetch('/api/tiles');
+  homeTilesCache = await res.json();
+  renderHomeTileGrid();
+}
+
+document.getElementById('homeTileSearchInput').addEventListener('input', renderHomeTileGrid);
+
+function renderHomeTileGrid() {
+  const grid = document.getElementById('homeTileGrid');
+  const term = (document.getElementById('homeTileSearchInput').value || '').trim().toLowerCase();
+  const list = term ? homeTilesCache.filter(t => (t.title || '').toLowerCase().includes(term)) : homeTilesCache;
+
+  grid.innerHTML = '';
+  if (!homeTilesCache.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum site cadastrado na página inicial</div><div>Os atalhos da home aparecerão aqui.</div></div>';
+    return;
+  }
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div></div>';
+    return;
+  }
+  list.forEach(tile => {
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = tile.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = tile.title;
+
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'tile-image-wrap';
+    if (tile.image) {
+      const img = document.createElement('img');
+      img.src = tile.image;
+      img.alt = tile.title;
+      img.loading = 'lazy';
+      imageWrap.appendChild(img);
+    } else {
+      const fallback = document.createElement('div');
+      fallback.className = 'tile-fallback';
+      fallback.textContent = (tile.title || '?').slice(0, 2).toUpperCase();
+      imageWrap.appendChild(fallback);
+    }
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'tile-title';
+    titleEl.textContent = tile.title;
+
+    a.appendChild(imageWrap);
+    a.appendChild(titleEl);
+    a.addEventListener('click', () => {
+      fetch('/api/track/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tileId: tile.id }),
+        keepalive: true
+      }).catch(() => {});
+    });
+    grid.appendChild(a);
+  });
 }
 
 checkSession();
