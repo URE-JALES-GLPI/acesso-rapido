@@ -24,20 +24,6 @@ document.getElementById('adminBtn').addEventListener('click', () => {
   window.location.href = '/admin.html';
 });
 
-// ---------- relogio e data no topo ----------
-(function () {
-  const timeEl = document.getElementById('clockTime');
-  const dateEl = document.getElementById('clockDate');
-  if (!timeEl || !dateEl) return;
-  function tick() {
-    const now = new Date();
-    timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    dateEl.textContent = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
-
 // ---------- saudacao e data ----------
 (function () {
   const greetingText = document.getElementById('greetingText');
