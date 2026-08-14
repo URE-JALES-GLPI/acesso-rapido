@@ -119,6 +119,35 @@ html[data-theme="light"] .brand .logo-light { display: block; }
   color: var(--text);
 }
 
+/* ---------- relogio e data no topo ---------- */
+.topbar-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.2;
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.topbar-clock .clock-time {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.topbar-clock .clock-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+.hero-top .topbar-clock { border-left-color: rgba(255, 255, 255, 0.25); }
+.hero-top .topbar-clock .clock-time { color: #fff; }
+.hero-top .topbar-clock .clock-date { color: rgba(255, 255, 255, 0.78); }
+@media (max-width: 480px) {
+  .topbar-clock { display: none; }
+}
+
 .topbar-actions {
   position: absolute;
   right: 32px;

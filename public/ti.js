@@ -20,6 +20,20 @@ function wireThemeToggle() {
 }
 wireThemeToggle();
 
+// ---------- relogio e data no topo ----------
+(function () {
+  const timeEl = document.getElementById('clockTime');
+  const dateEl = document.getElementById('clockDate');
+  if (!timeEl || !dateEl) return;
+  function tick() {
+    const now = new Date();
+    timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    dateEl.textContent = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
 // ---------- helpers compartilhados ----------
 function escapeHtml(str) {
   const div = document.createElement('div');

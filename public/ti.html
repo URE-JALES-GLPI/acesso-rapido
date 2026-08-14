@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 
-<link rel="stylesheet" href="/styles.css?v=18">
+<link rel="stylesheet" href="/styles.css?v=19">
 <script>
   (function () {
     const saved = localStorage.getItem('acesso-rapido-theme') || 'light';
@@ -55,6 +55,10 @@
       <img class="logo-dark" src="/assets/logo.png" alt="Acesso Rápido">
       <img class="logo-light" src="/assets/logo-light.png" alt="Acesso Rápido">
       <span class="brand-name">Área de TI</span>
+      <div class="topbar-clock">
+        <span class="clock-time" id="clockTime">--:--:--</span>
+        <span class="clock-date" id="clockDate"></span>
+      </div>
     </div>
     <div class="topbar-actions">
       <a href="/" class="icon-btn" title="Ver site" aria-label="Ver site">
@@ -216,6 +220,6 @@
 </div>
 
 <script src="/network-bg.js?v=15"></script>
-<script src="/ti.js?v=17"></script>
+<script src="/ti.js?v=18"></script>
 </body>
 </html>
