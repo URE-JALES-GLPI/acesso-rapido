@@ -315,3 +315,87 @@ async function loadTiles() {
 }
 
 loadTiles();
+
+// ---------- atalhos da area de TI na pagina inicial ----------
+// quem tem permissao de TI e esta logado ve os atalhos da TI (ja filtrados pela
+// visibilidade de grupo dela) em uma secao separada, abaixo dos atalhos da home.
+const tiTilesSection = document.getElementById('tiTilesSection');
+const homeTiTileGrid = document.getElementById('homeTiTileGrid');
+const homeTiTileSearchInput = document.getElementById('homeTiTileSearchInput');
+let homeTiTilesCache = [];
+
+function renderHomeTiTileGrid() {
+  const term = (homeTiTileSearchInput.value || '').trim().toLowerCase();
+  const list = term ? homeTiTilesCache.filter(t => (t.title || '').toLowerCase().includes(term)) : homeTiTilesCache;
+
+  homeTiTileGrid.innerHTML = '';
+  if (!list.length) {
+    homeTiTileGrid.innerHTML = term
+      ? '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div></div>'
+      : '<div class="empty-state"><div class="big">Nenhum atalho de TI disponível</div></div>';
+    return;
+  }
+  list.forEach(tile => {
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = tile.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = tile.title;
+
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'tile-image-wrap';
+    if (tile.image) {
+      const img = document.createElement('img');
+      img.src = tile.image;
+      img.alt = tile.title;
+      img.loading = 'lazy';
+      imageWrap.appendChild(img);
+      window.autoTrimImage(tile.image).then((trimmedUrl) => {
+        if (trimmedUrl) img.src = trimmedUrl;
+      });
+    } else {
+      const fallback = document.createElement('div');
+      fallback.className = 'tile-fallback';
+      fallback.textContent = initials(tile.title);
+      imageWrap.appendChild(fallback);
+    }
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'tile-title';
+    titleEl.textContent = tile.title;
+
+    a.appendChild(imageWrap);
+    a.appendChild(titleEl);
+    a.addEventListener('click', () => {
+      fetch('/api/ti/track/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tileId: tile.id }),
+        keepalive: true
+      }).catch(() => {});
+    });
+    homeTiTileGrid.appendChild(a);
+  });
+}
+
+homeTiTileSearchInput.addEventListener('input', renderHomeTiTileGrid);
+
+async function loadHomeTiTiles() {
+  try {
+    const sessionRes = await fetch('/api/session');
+    const session = await sessionRes.json();
+    if (!session.loggedIn || !session.permissions || !session.permissions.ti) return;
+
+    const res = await fetch('/api/ti/tiles');
+    homeTiTilesCache = await res.json();
+    if (!homeTiTilesCache.length) return;
+
+    tiTilesSection.style.display = 'block';
+    renderHomeTiTileGrid();
+  } catch (e) {
+    // secao nao e critica; some silenciosamente em caso de erro
+  }
+}
+
+loadHomeTiTiles();
