@@ -600,8 +600,22 @@ app.get('/api/track/clicks', requireAdmin, (req, res) => {
 });
 
 app.get('/api/track/searches', requireAdmin, (req, res) => {
-  const searches = [...readSearches()].reverse().slice(0, 200);
-  res.json(searches);
+  const allSearches = readSearches();
+  const history = [...allSearches].reverse().slice(0, 200);
+
+  // ranking de termos mais buscados (case-insensitive, mantem o texto mais recente)
+  const rankingMap = new Map();
+  for (const s of allSearches) {
+    const key = s.term.toLowerCase();
+    if (!rankingMap.has(key)) {
+      rankingMap.set(key, { term: s.term, count: 0 });
+    }
+    rankingMap.get(key).count++;
+    rankingMap.get(key).term = s.term;
+  }
+  const ranking = Array.from(rankingMap.values()).sort((a, b) => b.count - a.count);
+
+  res.json({ ranking, history });
 });
 
 // cliques agrupados por dia, para o grafico (ultimos 14 dias)

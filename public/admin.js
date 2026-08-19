@@ -608,12 +608,13 @@ async function loadStats() {
       fetch('/api/track/clicks/daily')
     ]);
     const clicksData = await clicksRes.json();
-    const searches = await searchesRes.json();
+    const searchesData = await searchesRes.json();
     const daily = await dailyRes.json();
 
     renderRanking(clicksData.ranking || []);
     renderClicksHistory(clicksData.history || []);
-    renderSearchesHistory(searches || []);
+    renderSearchesHistory(searchesData.history || []);
+    renderSearchRanking(searchesData.ranking || []);
     renderClicksChart(daily || []);
   } catch (e) {
     // estatisticas nao sao criticas, ignora silenciosamente
@@ -740,6 +741,24 @@ function renderSearchesHistory(searches) {
     row.innerHTML = `
       <span class="history-text">Buscou por "<strong>${escapeHtml(item.term)}</strong>"</span>
       <span class="history-time">${formatDateTime(item.timestamp)}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function renderSearchRanking(ranking) {
+  const el = document.getElementById('searchRankingList');
+  if (!ranking.length) {
+    el.innerHTML = '<div class="empty-admin">Ainda não há buscas registradas.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  ranking.slice(0, 10).forEach((item, index) => {
+    const row = document.createElement('div');
+    row.className = 'ranking-row';
+    row.innerHTML = `
+      <div class="ranking-position">${index + 1}</div>
+      <div class="ranking-title">${escapeHtml(item.term)}</div>
+      <div class="ranking-count">${item.count} vez${item.count === 1 ? '' : 'es'}</div>`;
     el.appendChild(row);
   });
 }
