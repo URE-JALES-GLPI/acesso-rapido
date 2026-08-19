@@ -269,13 +269,13 @@ function renderTileList() {
     row.className = 'tile-row';
     row.draggable = true;
 
-    const handle = document.createElement('button');
+    const handle = document.createElement('div');
     handle.className = 'drag-handle';
     handle.innerHTML = iconSvg('grip');
-    handle.title = 'Arrastar para reordenar';
+    handle.title = 'Arraste para reordenar';
 
     row.addEventListener('dragstart', (e) => {
-      if (!e.target.closest('.drag-handle')) {
+      if (e.target.closest('button')) {
         e.preventDefault();
         return;
       }
@@ -297,6 +297,8 @@ function renderTileList() {
       tilesCache = arr;
       dragIndex = before ? targetIdx : targetIdx + 1;
       renderTileList();
+      const dragRow = tileList.querySelectorAll('.tile-row')[dragIndex];
+      if (dragRow) dragRow.classList.add('dragging');
     });
     row.addEventListener('dragend', () => {
       row.classList.remove('dragging');
@@ -309,7 +311,7 @@ function renderTileList() {
     const thumb = document.createElement('div');
     thumb.className = 'thumb';
     thumb.innerHTML = tile.image
-      ? `<img src="${tile.image}" alt="${tile.title}">`
+      ? `<img src="${tile.image}" alt="${tile.title}" draggable="false">`
       : (tile.title || '?').slice(0, 2).toUpperCase();
 
     if (tile.image) {

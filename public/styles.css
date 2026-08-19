@@ -826,7 +826,9 @@ html[data-theme="light"] .tile { box-shadow: 0 2px 10px rgba(30, 50, 80, 0.06); 
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--bg-elevated-2);
+  cursor: grab;
 }
+.tile-row:active { cursor: grabbing; }
 
 .tile-row .thumb {
   width: 44px;
