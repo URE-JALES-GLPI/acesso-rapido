@@ -141,3 +141,7 @@ Sem domínio, dá para acessar direto por IP e porta (`http://SEU_IP:3000`) — 
 ## Backup
 
 Basta guardar uma cópia de `data/` (dados de tudo: acessos, alertas, usuários, estatísticas) e de `public/uploads/` (imagens e anexos).
+
+## Autor
+
+Desenvolvido por **Leonardo Poiatti Fação**.
