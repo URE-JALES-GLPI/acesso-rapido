@@ -658,10 +658,15 @@ async function loadStats() {
     const searchesData = await searchesRes.json();
     const daily = await dailyRes.json();
 
+    // se o servidor ainda roda a versao antiga (responde um array simples),
+    // aceita as duas formas para nao sumir com o historico
+    const searchesHistory = Array.isArray(searchesData) ? searchesData : (searchesData.history || []);
+    const searchesRanking = Array.isArray(searchesData) ? [] : (searchesData.ranking || []);
+
     renderRanking(clicksData.ranking || []);
     renderClicksHistory(clicksData.history || []);
-    renderSearchesHistory(searchesData.history || []);
-    renderSearchRanking(searchesData.ranking || []);
+    renderSearchesHistory(searchesHistory);
+    renderSearchRanking(searchesRanking);
     renderClicksChart(daily || []);
   } catch (e) {
     // estatisticas nao sao criticas, ignora silenciosamente
