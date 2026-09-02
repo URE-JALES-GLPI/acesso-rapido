@@ -20,6 +20,23 @@ themeToggle.addEventListener('click', () => {
   applyThemeIcon(next);
 });
 
+// ---------- controle de visibilidade da engrenagem de admin ----------
+// "Equipe de TI" (admin:false) NAO deve ver o menu de configuracao (engrenagem)
+// Esconde apenas quando o usuario esta logado sem permissao de admin;
+// visitante deslogado continua vendo para poder fazer login
+(async () => {
+  try {
+    const res = await fetch('/api/session');
+    const data = await res.json();
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn && data.loggedIn && (!data.permissions || !data.permissions.admin)) {
+      adminBtn.style.display = 'none';
+    }
+  } catch (e) {
+    // ignora erro de rede, mantem visivel
+  }
+})();
+
 document.getElementById('adminBtn').addEventListener('click', () => {
   window.location.href = '/admin.html';
 });

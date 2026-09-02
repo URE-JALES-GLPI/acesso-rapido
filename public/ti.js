@@ -66,6 +66,17 @@ let mySessionGroupId = null;
 async function checkSession() {
   const res = await fetch('/api/session');
   const data = await res.json();
+  // "Equipe de TI" nao deve ver a engrenagem de configuracao (manageToggleBtn)
+  // Somente quem tem permissao admin:true ve o menu de config
+  if (manageToggleBtn) {
+    if (data.permissions && data.permissions.admin) {
+      manageToggleBtn.style.display = '';
+    } else {
+      manageToggleBtn.style.display = 'none';
+      tiSplit.classList.remove('manage-mode');
+      manageToggleBtn.classList.remove('active');
+    }
+  }
   if (data.loggedIn && data.permissions && data.permissions.ti) {
     loginScreen.style.display = 'none';
     tiScreen.style.display = 'block';
