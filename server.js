@@ -57,6 +57,11 @@ if (!process.env.ADMIN_PASS_HASH) {
   console.error('Rode primeiro: npm run set-password\n');
   process.exit(1);
 }
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.startsWith('troque-')) {
+  console.error('\n[ERRO] SESSION_SECRET ausente ou com o valor de exemplo.');
+  console.error('Rode: npm run set-password (gera um segredo aleatorio no .env)\n');
+  process.exit(1);
+}
 
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS_HASH = process.env.ADMIN_PASS_HASH;
@@ -100,17 +105,10 @@ if (!fs.existsSync(USERS_FILE)) {
       passwordHash: ADMIN_PASS_HASH,
       groupId: ADMIN_GROUP_ID,
       createdAt: new Date().toISOString()
-    },
-    {
-      id: crypto.randomUUID(),
-      username: 'ti',
-      passwordHash: bcrypt.hashSync('jales.123', 10),
-      groupId: TI_GROUP_ID,
-      createdAt: new Date().toISOString()
     }
   ];
   fs.writeFileSync(USERS_FILE, JSON.stringify(initialUsers, null, 2));
-  console.log('[info] Usuarios iniciais criados: "' + ADMIN_USER + '" (Administradores) e "ti" (Equipe de TI).');
+  console.log('[info] Usuario inicial criado: "' + ADMIN_USER + '" (Administradores). Crie os usuarios da Equipe de TI pelo painel admin.');
 } else {
   // migra usuarios antigos (com "role") para o novo sistema de grupos
   const existingUsers = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8') || '[]');
@@ -134,7 +132,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   store: new FileStore({ path: SESSIONS_DIR, logFn: () => {} }),
-  secret: process.env.SESSION_SECRET || 'troque-isso',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {

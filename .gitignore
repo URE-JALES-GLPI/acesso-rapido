@@ -4,3 +4,8 @@ data/sessions/
 public/uploads/*
 !public/uploads/.gitkeep
 npm-debug.log
+
+# Chaves e dados de usuarios (nunca versionar)
+*.pem
+keys/
+data/users.json

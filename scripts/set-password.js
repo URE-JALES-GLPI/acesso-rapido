@@ -61,7 +61,7 @@ rl.question(`Usuario admin [${current.ADMIN_USER || 'admin'}]: `, (user) => {
     const hash = bcrypt.hashSync(pass.trim(), 10);
     current.ADMIN_USER = adminUser;
     current.ADMIN_PASS_HASH = hash;
-    if (!current.SESSION_SECRET) {
+    if (!current.SESSION_SECRET || current.SESSION_SECRET.startsWith('troque-')) {
       current.SESSION_SECRET = require('crypto').randomBytes(32).toString('hex');
     }
     if (!current.PORT) current.PORT = 3000;
